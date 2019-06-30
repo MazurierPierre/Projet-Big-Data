@@ -1,10 +1,5 @@
 import random
 import copy
-import math
-import matplotlib.pyplot as plt
-import networkx as nx
-import numpy as np
-import time
 
 
 # Program Parameters
@@ -25,14 +20,6 @@ def generate_matrix(nb_city, max_weight):
                 matrix[i][j] = matrix[j][i] = random.randint(1, max_weight)
 
     return matrix
-
-
-# Self explanatory, print a graph (in matrix form) to the console
-def print_matrix(matrix):
-    for i in range(0, NB_CITY):
-        for j in range(0, NB_CITY):
-            print(" ", matrix[i][j], end='')
-        print()
 
 
 # Calculates the travel time for a given path
@@ -59,7 +46,6 @@ def ran_swap(path):
 
 # Calculates the shortest path, going through all nodes and back, passing only once per node in a complete graph
 def simulated_annealing(matrix):
-    ts = time.clock()
     temp = 4
     cooling_rate = 0.001
     d = 0
@@ -100,26 +86,11 @@ def simulated_annealing(matrix):
 
     print("Itierations. . . . : ", d)
 
-    return path, distance, time.clock() - ts, total_history, selected
+    return path, distance, total_history, selected
 
 
 # Generate matrix and calculate optimal path
 g = generate_matrix(NB_CITY, MAX_DISTANCE)
-optimal_path, distance, duration, history, selected = simulated_annealing(g)
+optimal_path, distance, history, selected = simulated_annealing(g)
 print("Optimal Path . . . : ", optimal_path)
 print("Total Distance . . : ", distance)
-print("Algorithm Duration : ", duration)
-
-# Convert matrix (aka 2D Array) into a nx adjascency matrix
-# converted_graph = nx.from_numpy_matrix(np.matrix(g))
-
-plt.plot(history)
-plt.plot(selected)
-
-# Draw graph
-# pos = nx.spring_layout(converted_graph)
-# nx.draw(converted_graph, pos, with_labels=True)
-# labels = nx.get_edge_attributes(converted_graph, 'weight')
-# nx.draw_networkx_edge_labels(converted_graph, pos, edge_labels=labels)
-
-plt.show()
