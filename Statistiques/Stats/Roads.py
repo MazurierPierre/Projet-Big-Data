@@ -1,7 +1,8 @@
 import pandas as pd
 from collections import Counter
+import matplotlib.pyplot as plt
 
-roads = pd.read_excel("C:\\Users\\emili\\Desktop\\project\\tests\\analyse\\Dataset.xlsx", sheet_name='Roads')
+roads = pd.read_excel("C:\\Users\\emili\\Desktop\\project\\tests\\analyse\\Dataset1.xlsx", sheet_name='Roads')
 
 print("=================LIAISON DES VILLES & DEGRES=======================")
 # print(Counter(roads['IDCityTarget'].values))
@@ -31,3 +32,5 @@ print('Médiane : ' + repr(medianWeightRoads))
 print('Q3 : ' + repr(Q3WeightRoads))
 print('Most common value : ' + repr(modeWeightRoads))
 
+plt.boxplot(roads['Weight'], vert=False)
+plt.show()

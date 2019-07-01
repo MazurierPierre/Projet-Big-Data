@@ -1,6 +1,6 @@
 import pandas as pd
 
-rglobal = pd.read_excel("C:\\Users\\emili\\Desktop\\project\\tests\\analyse\\Dataset.xlsx", sheet_name='Params')
+rglobal = pd.read_excel("C:\\Users\\emili\\Desktop\\project\\tests\\analyse\\Dataset1.xlsx", sheet_name='Params')
 
 
 print("=================GLOBAL=======================")
