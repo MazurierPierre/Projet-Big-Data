@@ -3,8 +3,9 @@ import copy
 
 
 # Program Parameters
-NB_CITY = 100
-MAX_DISTANCE = 10
+NB_CITY = 7
+MAX_DISTANCE = 3
+NB_TRUCK = 2
 
 
 # Generate a complete graph (in matrix form) with random weights
@@ -89,8 +90,46 @@ def simulated_annealing(matrix):
     return path, distance, total_history, selected
 
 
+def sa_vrp(matrix, truck_count, nb_city):
+
+    full_path = []
+    truck_path = [[None for i in range(int(nb_city / truck_count))] for j in range(truck_count)]
+
+    # Make a "random" list of cities and paths
+    for i in range(1, NB_CITY):
+        full_path.append(i)
+    full_path.append(0)
+
+    # Split in k equal length arrays
+    index = 0
+    for truck in range(0, truck_count):
+        for i in range(int(nb_city / truck_count)):
+            truck_path[truck][i] = full_path[index]
+            index = index + 1
+        truck_path[truck].append(0)
+
+    # Calculate weight of all arrays
+    weights = [[] for i in range(truck_count)]
+    for i in range(truck_count):
+        weights[i].append(path_travel_time(truck_path[i], matrix))
+
+    print("Full path : ", full_path)
+    for truck in range(truck_count):
+        print("Truck ", truck, " path ",  truck_path[truck], " : ", weights[truck])
+
+    # Random swap paths between highest and lowest array
+    # Compare if the difference between arrays is better or worst
+
+
 # Generate matrix and calculate optimal path
 g = generate_matrix(NB_CITY, MAX_DISTANCE)
-optimal_path, distance, history, selected = simulated_annealing(g)
-print("Optimal Path . . . : ", optimal_path)
-print("Total Distance . . : ", distance)
+# g = [
+#     [0, 1, 2, 3, 4, 5, 6],
+#     [1, 0, 1, 2, 3, 4, 5],
+#     [2, 1, 0, 1, 4, 3, 4],
+#     [3, 2, 1, 0, 1, 2, 3],
+#     [4, 3, 2, 1, 0, 1, 2],
+#     [5, 4, 3, 2, 1, 0, 1],
+#     [6, 5, 4, 3, 2, 1, 0]
+# ]
+sa_vrp(g, NB_TRUCK, NB_CITY)

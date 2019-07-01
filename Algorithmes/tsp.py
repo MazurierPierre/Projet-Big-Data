@@ -8,7 +8,7 @@ import time
 
 
 # Program Parameters
-NB_CITY = 100
+NB_CITY = 1000
 MAX_DISTANCE = 10
 
 
