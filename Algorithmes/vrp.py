@@ -1,14 +1,13 @@
 import random
 import copy
+import matplotlib.pyplot as plt
 
 
-# Program Parameters
-NB_CITY = 7
-MAX_DISTANCE = 3
-NB_TRUCK = 2
+NB_CITY = 10
+NB_TRUCK = 3
+MAX_DISTANCE = 10
 
 
-# Generate a complete graph (in matrix form) with random weights
 def generate_matrix(nb_city, max_weight):
     matrix = [[None for i in range(nb_city)] for j in range(nb_city)]
 
@@ -23,113 +22,89 @@ def generate_matrix(nb_city, max_weight):
     return matrix
 
 
-# Calculates the travel time for a given path
 def path_travel_time(path, matrix):
     distance = x = 0
 
-    for i in range(0, NB_CITY):
+    for i in range(0, len(path)):
         distance = distance + matrix[x][path[i]]
         x = path[i]
 
     return distance
 
 
-# Swaps radomly 2 elements in a path
-def ran_swap(path):
-    r0, r1 = random.sample(range(0, NB_CITY - 1), 2)
+def ran_swap_arrays(path1, path2):
+    r0, r1 = random.sample(range(0, len(path1) - 1), 2)
 
-    temp = path[r1]
-    path[r1] = path[r0]
-    path[r0] = temp
+    temp = path1[r1]
+    path1[r1] = path2[r0]
+    path2[r0] = temp
 
-    return path
+    return path1, path2
 
 
-# Calculates the shortest path, going through all nodes and back, passing only once per node in a complete graph
-def simulated_annealing(matrix):
-    temp = 4
-    cooling_rate = 0.001
-    d = 0
+def sa_vrp(matrix, nb_trucks):
+    global_path = []
+    weight_history = [[] for i in range(NB_TRUCK)]
 
-    total_history = []
-    selected = []
-    path = []
-
-    # Make a "random" list of cities and paths
+    # Get "random" path
     for i in range(1, NB_CITY):
-        path.append(i)
-    path.append(0)
+        global_path.append(i)
+    global_path.append(0)
 
-    # Calculate distance for the first path
-    distance = path_travel_time(path, matrix)
-    total_history.append(distance)
-    selected.append(distance)
-
-    while temp > 1:
-
-        # randomly swap 2 cities
-        new_path = ran_swap(copy.copy(path))
-
-        # Calculate the new distance
-        new_distance = path_travel_time(new_path, matrix)
-        total_history.append(new_distance)
-
-        # Compare both distance and new distance
-        # if math.exp(distance - new_distance) / temp >= random.uniform(0, 1):
-        if new_distance < distance:
-            distance = new_distance
-            path = new_path
-
-        # Iterate
-        selected.append(distance)
-        temp = temp * (1 - cooling_rate)
-        d = d + 1
-
-    print("Itierations. . . . : ", d)
-
-    return path, distance, total_history, selected
-
-
-def sa_vrp(matrix, truck_count, nb_city):
-
-    full_path = []
-    truck_path = [[None for i in range(int(nb_city / truck_count))] for j in range(truck_count)]
-
-    # Make a "random" list of cities and paths
-    for i in range(1, NB_CITY):
-        full_path.append(i)
-    full_path.append(0)
-
-    # Split in k equal length arrays
+    # Chop array in k equal length arrays
+    path = [[] for i in range(nb_trucks)]
     index = 0
-    for truck in range(0, truck_count):
-        for i in range(int(nb_city / truck_count)):
-            truck_path[truck][i] = full_path[index]
+    for i in range(nb_trucks):
+        for j in range(int(NB_CITY / nb_trucks)):
+            path[i].append(global_path[index])
             index = index + 1
-        truck_path[truck].append(0)
+        path[i].append(0)
 
-    # Calculate weight of all arrays
-    weights = [[] for i in range(truck_count)]
-    for i in range(truck_count):
-        weights[i].append(path_travel_time(truck_path[i], matrix))
+    # Calculate total weights for all k arrays
+    weight = []
+    for i in range(nb_trucks):
+        weight.append(path_travel_time(path[i], matrix))
 
-    print("Full path : ", full_path)
-    for truck in range(truck_count):
-        print("Truck ", truck, " path ",  truck_path[truck], " : ", weights[truck])
+    for k in range(0, 200):
+        # Select biggest and smallest index
+        big = small = weight[0]
+        i_big = i_small = 0
+        for i in range(1, len(weight)):
+            if weight[i] > big:
+                big = weight[i]
+                i_big = i
+            if weight[i] < small:
+                small = weight[i]
+                i_small = i
 
-    # Random swap paths between highest and lowest array
-    # Compare if the difference between arrays is better or worst
+        # Random swap value in both arrays
+        new_path = copy.copy(path)
+        new_path[i_small], new_path[i_big] = ran_swap_arrays(new_path[i_small], new_path[i_big])
+
+        for i in range(NB_TRUCK):
+            weight_history[i].append(weight[i])
+
+        # Acceptance function
+        if abs(path_travel_time(path[i_big], matrix) - path_travel_time(path[i_small], matrix)) < abs(weight[i_big] - weight[i_small]):
+
+            # Update weights
+            weight.clear()
+            for i in range(nb_trucks):
+                weight.append(path_travel_time(path[i], matrix))
+
+            # Keep new paths
+            path = new_path
+        else:
+            print()
+
+    return path, weight, weight_history
 
 
-# Generate matrix and calculate optimal path
+# Generate matrix
 g = generate_matrix(NB_CITY, MAX_DISTANCE)
-# g = [
-#     [0, 1, 2, 3, 4, 5, 6],
-#     [1, 0, 1, 2, 3, 4, 5],
-#     [2, 1, 0, 1, 4, 3, 4],
-#     [3, 2, 1, 0, 1, 2, 3],
-#     [4, 3, 2, 1, 0, 1, 2],
-#     [5, 4, 3, 2, 1, 0, 1],
-#     [6, 5, 4, 3, 2, 1, 0]
-# ]
-sa_vrp(g, NB_TRUCK, NB_CITY)
+p, w, h = sa_vrp(g, NB_TRUCK)
+
+for i in range(NB_TRUCK):
+    plt.plot(h[i])
+
+plt.show()
