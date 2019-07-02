@@ -1,6 +1,7 @@
 import random
 import copy
 import matplotlib.pyplot as plt
+import math
 
 
 NB_CITY = 10
@@ -35,9 +36,13 @@ def path_travel_time(path, matrix):
 def ran_swap_arrays(path1, path2):
     r0, r1 = random.sample(range(0, len(path1) - 1), 2)
 
+    print("1: ", path1, "   ", path2)
+
     temp = path1[r1]
     path1[r1] = path2[r0]
     path2[r0] = temp
+
+    print("2: ", path1, "   ", path2)
 
     return path1, path2
 
@@ -45,6 +50,7 @@ def ran_swap_arrays(path1, path2):
 def sa_vrp(matrix, nb_trucks):
     global_path = []
     weight_history = [[] for i in range(NB_TRUCK)]
+    distance = new_distance = 0
 
     # Get "random" path
     for i in range(1, NB_CITY):
@@ -65,7 +71,12 @@ def sa_vrp(matrix, nb_trucks):
     for i in range(nb_trucks):
         weight.append(path_travel_time(path[i], matrix))
 
+    distance = new_distance = 0
+    for route in path:
+        distance = distance + path_travel_time(route, matrix)
+
     for k in range(0, 200):
+
         # Select biggest and smallest index
         big = small = weight[0]
         i_big = i_small = 0
@@ -81,21 +92,34 @@ def sa_vrp(matrix, nb_trucks):
         new_path = copy.copy(path)
         new_path[i_small], new_path[i_big] = ran_swap_arrays(new_path[i_small], new_path[i_big])
 
+        print("Old: ", path)
+        print("New: ", new_path)
+
+        new_distance = 0;
+        for route in path:
+            new_distance = new_distance + path_travel_time(route, matrix)
+
         for i in range(NB_TRUCK):
             weight_history[i].append(weight[i])
 
+        print("Old Distance:", distance, "   New Distance:", new_distance)
+
         # Acceptance function
-        if abs(path_travel_time(path[i_big], matrix) - path_travel_time(path[i_small], matrix)) < abs(weight[i_big] - weight[i_small]):
+        if math.exp(distance - new_distance) / 1 >= random.uniform(0, 1):
+
+            # Keep new paths
+            path = new_path
+            distance = new_distance
 
             # Update weights
             weight.clear()
             for i in range(nb_trucks):
                 weight.append(path_travel_time(path[i], matrix))
 
-            # Keep new paths
-            path = new_path
+            print("Accept")
+
         else:
-            print()
+            print("Reject")
 
     return path, weight, weight_history
 
