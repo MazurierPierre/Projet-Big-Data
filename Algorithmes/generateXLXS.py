@@ -73,11 +73,10 @@ listeObject = (
 
 def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo, listeParams, listeMachine,
                     listeObject):
-    workbook = xlsxwriter.Workbook('Dataset' + repr(numeroexec) + '.xlsx')
+    workbook = xlsxwriter.Workbook('datasets/Dataset' + repr(numeroexec) + '.xlsx')
     bold = workbook.add_format({'bold': True})
     # Ligne et colonne de départ pour l'écriture
 
-    print("Cities Generation....")
     row = 1
     col = 0
 
@@ -96,7 +95,6 @@ def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo
         worksheet.write(row, col + 3, timedelivered)
         row += 1
 
-    print("Roads generation...")
     row = 1
     col = 0
     worksheet2 = workbook.add_worksheet("Roads")
@@ -112,7 +110,6 @@ def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo
         worksheet2.write(row, col + 2, weight)
         row += 1
 
-    print("Trucks generation...")
     row = 1
     col = 0
 
@@ -127,7 +124,6 @@ def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo
         worksheet3.write(row, col + 1, vtype)
         row += 1
 
-    print("Cargo generation...")
     row = 1
     col = 0
 
@@ -141,7 +137,6 @@ def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo
         worksheet4.write(row, col + 1, vobject)
         row += 1
 
-    print("Params generation...")
     row = 1
     col = 0
 
@@ -158,7 +153,6 @@ def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo
         worksheet5.write(row, col + 2, desc)
         row += 1
 
-    print("Machine generation...")
     row = 1
     col = 0
 
@@ -173,7 +167,6 @@ def generatedataset(numeroexec, listeCities, listeRoads, listeTrucks, listeCargo
         worksheet6.write(row, col + 1, value)
         row += 1
 
-    print("Object generation...")
     row = 1
     col = 0
 

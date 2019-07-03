@@ -28,6 +28,7 @@ def simulated_annealing(matrix, nb_trucks, temperature, cool_rate):
     weight_history = [[] for i in range(nb_trucks)]
     distance_history = []
     ts = time.clock()
+    iterations = 0
 
     # Get "random" path
     for i in range(1, nb_city):
@@ -71,5 +72,6 @@ def simulated_annealing(matrix, nb_trucks, temperature, cool_rate):
 
         distance_history.append(distance)
         temperature = temperature * (1 - cool_rate)
+        iterations = iterations + 1
 
-    return path, distance, time.clock() - ts, distance_history
+    return path, distance, time.clock() - ts, iterations, distance_history

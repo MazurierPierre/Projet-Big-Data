@@ -19,7 +19,7 @@ def ran_swap(path):
 # Calculates the shortest path, going through all nodes and back, passing only once per node in a complete graph
 def simulated_annealing(matrix, temp, cooling_rate):
     ts = time.clock()
-    d = 0
+    iterations = 0
 
     total_history = []
     selected = []
@@ -52,9 +52,7 @@ def simulated_annealing(matrix, temp, cooling_rate):
         # Iterate
         selected.append(distance)
         temp = temp * (1 - cooling_rate)
-        d = d + 1
-
-    print("Itierations. . . . : ", d)
+        iterations = iterations + 1
 
     # Returns :
     #   path            The optimal path
@@ -62,4 +60,4 @@ def simulated_annealing(matrix, temp, cooling_rate):
     #   time - ts       The time the algorithme took to calculate the path
     #   total_history   History of all the total weights of each path tested
     #   selected        History of all of the total weights of the selected paths
-    return path, distance, time.clock() - ts, total_history, selected
+    return path, distance, time.clock() - ts, iterations, total_history, selected
