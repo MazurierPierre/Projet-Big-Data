@@ -100,6 +100,12 @@ def simulated_annealing(matrix):
 
     print("Itierations. . . . : ", d)
 
+    # Returns :
+    #   path            The optimal path
+    #   distance        The sum of the weights of the path
+    #   time - ts       The time the algorithme took to calculate the path
+    #   total_history   History of all the total weights of each path tested
+    #   selected        History of all of the total weights of the selected paths
     return path, distance, time.clock() - ts, total_history, selected
 
 
