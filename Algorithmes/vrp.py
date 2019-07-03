@@ -1,135 +1,75 @@
 import random
+import time
 import copy
+import math
+from Algorithmes import matrix as mtx
 
 
-# Program Parameters
-NB_CITY = 7
-MAX_DISTANCE = 3
-NB_TRUCK = 2
+def ran_swap_arrays(path):
 
+    source, target = random.sample(range(len(path)), 2)
+    src_index = random.randint(0, len(path[source]) - 2)
+    trg_index = random.randint(0, len(path[target]) - 2)
 
-# Generate a complete graph (in matrix form) with random weights
-def generate_matrix(nb_city, max_weight):
-    matrix = [[None for i in range(nb_city)] for j in range(nb_city)]
-
-    for i in range(nb_city):
-        for j in range(nb_city):
-            if i == j:
-                matrix[i][j] = 0
-                break
-            else:
-                matrix[i][j] = matrix[j][i] = random.randint(1, max_weight)
-
-    return matrix
-
-
-# Calculates the travel time for a given path
-def path_travel_time(path, matrix):
-    distance = x = 0
-
-    for i in range(0, NB_CITY):
-        distance = distance + matrix[x][path[i]]
-        x = path[i]
-
-    return distance
-
-
-# Swaps radomly 2 elements in a path
-def ran_swap(path):
-    r0, r1 = random.sample(range(0, NB_CITY - 1), 2)
-
-    temp = path[r1]
-    path[r1] = path[r0]
-    path[r0] = temp
+    if len(path[source]) > 2:
+        path[target].insert(trg_index, path[source][src_index])
+        path[source].pop(src_index)
+    else:
+        temp = path[target][trg_index]
+        path[target][trg_index] = path[source][0]
+        path[source][src_index] = temp
 
     return path
 
 
-# Calculates the shortest path, going through all nodes and back, passing only once per node in a complete graph
-def simulated_annealing(matrix):
-    temp = 4
-    cooling_rate = 0.001
-    d = 0
+def simulated_annealing(matrix, nb_trucks, temperature, cool_rate):
+    nb_city = len(matrix)
+    global_path = []
+    weight_history = [[] for i in range(nb_trucks)]
+    distance_history = []
+    ts = time.clock()
 
-    total_history = []
-    selected = []
-    path = []
+    # Get "random" path
+    for i in range(1, nb_city):
+        global_path.append(i)
 
-    # Make a "random" list of cities and paths
-    for i in range(1, NB_CITY):
-        path.append(i)
-    path.append(0)
-
-    # Calculate distance for the first path
-    distance = path_travel_time(path, matrix)
-    total_history.append(distance)
-    selected.append(distance)
-
-    while temp > 1:
-
-        # randomly swap 2 cities
-        new_path = ran_swap(copy.copy(path))
-
-        # Calculate the new distance
-        new_distance = path_travel_time(new_path, matrix)
-        total_history.append(new_distance)
-
-        # Compare both distance and new distance
-        # if math.exp(distance - new_distance) / temp >= random.uniform(0, 1):
-        if new_distance < distance:
-            distance = new_distance
-            path = new_path
-
-        # Iterate
-        selected.append(distance)
-        temp = temp * (1 - cooling_rate)
-        d = d + 1
-
-    print("Itierations. . . . : ", d)
-
-    return path, distance, total_history, selected
-
-
-def sa_vrp(matrix, truck_count, nb_city):
-
-    full_path = []
-    truck_path = [[None for i in range(int(nb_city / truck_count))] for j in range(truck_count)]
-
-    # Make a "random" list of cities and paths
-    for i in range(1, NB_CITY):
-        full_path.append(i)
-    full_path.append(0)
-
-    # Split in k equal length arrays
+    # Chop array in k arrays
+    path = [[] for i in range(nb_trucks)]
     index = 0
-    for truck in range(0, truck_count):
-        for i in range(int(nb_city / truck_count)):
-            truck_path[truck][i] = full_path[index]
+    for i in range(nb_trucks):
+        for j in range(int(nb_city / nb_trucks)):
+            path[i].append(global_path[index])
             index = index + 1
-        truck_path[truck].append(0)
+        path[i].append(0)
 
-    # Calculate weight of all arrays
-    weights = [[] for i in range(truck_count)]
-    for i in range(truck_count):
-        weights[i].append(path_travel_time(truck_path[i], matrix))
+    # Calculating total distance for the first path
+    distance = 0
+    for route in path:
+        distance = distance + mtx.path_weight(route, matrix)
 
-    print("Full path : ", full_path)
-    for truck in range(truck_count):
-        print("Truck ", truck, " path ",  truck_path[truck], " : ", weights[truck])
+    for i in range(nb_trucks):
+        weight_history[i].append(mtx.path_weight(path[i], matrix))
 
-    # Random swap paths between highest and lowest array
-    # Compare if the difference between arrays is better or worst
+    distance_history.append(distance)
 
+    while temperature >= 1:
 
-# Generate matrix and calculate optimal path
-g = generate_matrix(NB_CITY, MAX_DISTANCE)
-# g = [
-#     [0, 1, 2, 3, 4, 5, 6],
-#     [1, 0, 1, 2, 3, 4, 5],
-#     [2, 1, 0, 1, 4, 3, 4],
-#     [3, 2, 1, 0, 1, 2, 3],
-#     [4, 3, 2, 1, 0, 1, 2],
-#     [5, 4, 3, 2, 1, 0, 1],
-#     [6, 5, 4, 3, 2, 1, 0]
-# ]
-sa_vrp(g, NB_TRUCK, NB_CITY)
+        # Random swap value in both arrays
+        new_path = ran_swap_arrays(copy.copy(path))
+
+        # New distance calculations
+        new_distance = 0
+        for route in path:
+            new_distance = new_distance + mtx.path_weight(route, matrix)
+
+        # Acceptance function
+        if math.exp(distance - new_distance) / temperature >= random.uniform(0, 1):
+
+            # Keep new paths
+            path = new_path
+            distance = new_distance
+
+        distance_history.append(distance)
+        temperature = temperature * (1 - cool_rate)
+
+    return path, distance, time.clock() - ts, distance_history
