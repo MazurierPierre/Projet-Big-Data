@@ -45,11 +45,10 @@ def simulated_annealing(matrix, nb_trucks, temperature, cool_rate):
 
     # Calculating total distance for the first path
     distance = 0
-    for route in path:
-        distance = distance + mtx.path_weight(route, matrix)
-
     for i in range(nb_trucks):
-        weight_history[i].append(mtx.path_weight(path[i], matrix))
+        path_weight = mtx.path_weight(path[i], matrix)
+        distance = distance + path_weight
+        weight_history[i].append(path_weight)
 
     distance_history.append(distance)
 
@@ -60,8 +59,10 @@ def simulated_annealing(matrix, nb_trucks, temperature, cool_rate):
 
         # New distance calculations
         new_distance = 0
-        for route in path:
-            new_distance = new_distance + mtx.path_weight(route, matrix)
+        for i in range(nb_trucks):
+            path_weight = mtx.path_weight(new_path[i], matrix)
+            new_distance = new_distance + path_weight
+            weight_history[i].append(path_weight)
 
         # Acceptance function
         if math.exp(distance - new_distance) / temperature >= random.uniform(0, 1):
@@ -74,4 +75,4 @@ def simulated_annealing(matrix, nb_trucks, temperature, cool_rate):
         temperature = temperature * (1 - cool_rate)
         iterations = iterations + 1
 
-    return path, distance, time.clock() - ts, iterations, distance_history
+    return path, distance, time.clock() - ts, iterations, distance_history, weight_history

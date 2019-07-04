@@ -44,21 +44,27 @@ def run_vrp(exec_number):
     g = mtx.generate(NB_CITY, MAX_DISTANCE)
 
     # Run VRP
-    path, distance, sa_duration, iterations, distance_history = vrp.simulated_annealing(g, NB_TRUCK, TEMPERATURE, COOL_RATE)
+    path, distance, sa_duration, iterations, distance_history, weight_history = vrp.simulated_annealing(g, NB_TRUCK, TEMPERATURE, COOL_RATE)
 
     # Save data
     save_data(exec_number, g, sa_duration, iterations, distance)
 
-    # print("Optimal paths :")
-    # for i in range(NB_TRUCK):
-    #     print("    Truck ", i, ":", path[i])
+    print("Optimal paths :")
+    for i in range(NB_TRUCK):
+        print("    Truck ", i, ":", path[i])
 
-    # print("Total weight :", distance)
-    # print("Run time     : ", sa_duration)
+    print("Total weight :", distance)
+    print("Run time     : ", sa_duration)
 
     # mtx.print_console(g)
     # mtx.plot(g)
-    # plt.show()
+
+    for w in weight_history:
+        plt.plot(w)
+
+    plt.plot(distance_history)
+
+    plt.show()
 
 
 def save_data(exec_number, matrix, algorithm_duration, iterations, distance):
@@ -104,60 +110,5 @@ def save_data(exec_number, matrix, algorithm_duration, iterations, distance):
                             list_objects)
 
 
-print("NB_CITY 10")
-for i in range(0, 10):
-    run_vrp(i)
-
-NB_CITY = 100
-print("NB_CITY 100")
-for i in range(10, 20):
-    run_vrp(i)
-
-NB_CITY = 1000
-print("NB_CITY 1000")
-for i in range(20, 30):
-    run_vrp(i)
-
-
-NB_CITY = 100
-print("MAX DISTANCE 9")
-for i in range(30, 40):
-    run_vrp(i)
-
-MAX_DISTANCE = 99
-print("MAX DISTANCE 99")
-for i in range(40, 50):
-    run_vrp(i)
-
-
-MAX_DISTANCE = 9
-print("NB_TRUCKS 3")
-for i in range(50, 60):
-    run_vrp(i)
-
-NB_TRUCK = 11
-print("NB_TRUCKS 11")
-for i in range(60, 70):
-    run_vrp(i)
-
-NB_TRUCK = 33
-print("NB_TRUCKS 33")
-for i in range(70, 80):
-    run_vrp(i)
-
-
-NB_TRUCK = 3
-COOL_RATE = 0.01
-print("COOLDOWN 0.01")
-for i in range(80, 90):
-    run_vrp(i)
-
-COOL_RATE = 0.001
-print("COOLDOWN 0.001")
-for i in range(90, 100):
-    run_vrp(i)
-
-COOL_RATE = 0.0001
-print("COOLDOWN 0.0001")
-for i in range(100, 110):
-    run_vrp(i)
+run_vrp(0)
+#run_tsp(0)
