@@ -11,7 +11,7 @@ MAX_DISTANCE = 9
 
 # Simulated annealing constants
 TEMPERATURE = 4
-COOL_RATE = 0.001
+COOL_RATE = 0.002
 
 # VRP constants
 NB_TRUCK = 3
@@ -25,7 +25,7 @@ def run_tsp(exec_number):
     path, distance, sa_duration, iterations, total_history, selected = tsp.simulated_annealing(g, TEMPERATURE, COOL_RATE)
 
     # Save data
-    save_data(exec_number, g, sa_duration, iterations, distance)
+    # save_data(exec_number, g, sa_duration, iterations, distance)
 
     print("Optimal path : ", path)
     print("Total weight : ", distance)
@@ -47,7 +47,7 @@ def run_vrp(exec_number):
     path, distance, sa_duration, iterations, distance_history, weight_history = vrp.simulated_annealing(g, NB_TRUCK, TEMPERATURE, COOL_RATE)
 
     # Save data
-    save_data(exec_number, g, sa_duration, iterations, distance)
+    # save_data(exec_number, g, sa_duration, iterations, distance)
 
     print("Optimal paths :")
     for i in range(NB_TRUCK):
@@ -61,7 +61,6 @@ def run_vrp(exec_number):
 
     for w in weight_history:
         plt.plot(w)
-
     plt.plot(distance_history)
 
     plt.show()
